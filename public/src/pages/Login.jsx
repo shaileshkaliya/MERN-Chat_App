@@ -3,10 +3,8 @@ import loginLogo from "../assets/loginLogo.png";
 import { Link } from "react-router-dom";
 
 function Login() {
-  const [data, setData] = useState({
-    username: "",
-    password: "",
-  });
+  const loginData = { username: "", password: "" };
+  const [data, setData] = useState(loginData);
 
   return (
     <div className="w-screen h-screen bg-[#131324] flex justify-center items-center">
@@ -51,9 +49,7 @@ function Login() {
           <p className="text-white font-light sm:text-sm text-[12px]">
             DON'T HAVE AN ACCOUNT ?{" "}
             <Link to="/register" className="text-[#100bd8]">
-              <span
-                className="text-[#100bd8] cursor-pointer"
-              >
+              <span className="text-[#100bd8] cursor-pointer">
                 CREATE ONE .
               </span>{" "}
             </Link>
