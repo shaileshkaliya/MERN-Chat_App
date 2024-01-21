@@ -1,6 +1,11 @@
 import { useState } from "react";
 import logo from "../assets/loginLogo.png";
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
+import {ToastContainer, toast} from "react-toastify"
+import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios'
+import {registerRoute} from '../utils/APIRoutes'
+
 
 function Register() {
   const signupData = {
@@ -9,7 +14,76 @@ function Register() {
     password: "",
     confirmPassword: "",
   };
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(signupData);
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    if(handleValidation()){
+      const {username, email, password} = formData;
+      // const {data} = await axios.post(registerRoute, {
+      //   username, email, password
+      // });
+      try {
+        const response = await axios.post(registerRoute, { username, email, password });
+        console.log('Registration successful:', response.data);
+
+        if (response.data.status === false) {
+            toast.error(response.data.message, toastOptions);
+        }
+
+        console.log(response.data);
+    } catch (error) {
+        console.error('Registration failed:', error.response.data);
+    }
+
+      // if(response.data.status===false){
+      //   toast.error(data.msg, toastOptions);
+      // }
+      // console.log(response.data);
+    }
+  }
+
+  const handleValidation = () => {
+    const {username, email, password, confirmPassword} = formData;
+
+    if(password != confirmPassword){
+      toast.error(
+        "Password & confirm password must be same",
+        toastOptions
+      )
+      return false;
+    }else if(username.length < 3){
+      toast.error(
+        "Username should be greater than 3 characters",
+        toastOptions
+      )
+      return false;
+    } else if(password.length < 8){
+      toast.error(
+        "Password length should be greater than 8",
+        toastOptions
+      )
+      return false;
+    }else if(email===""){
+      toast.error(
+        "Email is required",
+        toastOptions
+      )
+      return false;
+    }
+
+    return true;
+  }
 
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-[#131324]">
@@ -22,7 +96,10 @@ function Register() {
         </div>
 
         <div className="w-full flex flex-col items-center h-full">
-          <form className="flex flex-col w-full items-center h-3/4 justify-evenly">
+          <form className="flex flex-col w-full items-center h-3/4 justify-evenly"
+            onSubmit={(e)=>handleSubmit()}
+            action=""
+          >
             <input
               type="text"
               name="username"
@@ -59,7 +136,7 @@ function Register() {
               required
               className="bg-transparent border-[#480eea] border-[1px] rounded-lg text-[#5b5f67] p-2 text-sm w-3/4"
             />
-            <button className="w-3/4 bg-[#9979f1] text-white p-[4px] rounded-lg">
+            <button type="submit" className="w-3/4 bg-[#9979f1] text-white p-[4px] rounded-lg">
               CREATE USER
             </button>
           </form>
@@ -73,6 +150,7 @@ function Register() {
           </p>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
