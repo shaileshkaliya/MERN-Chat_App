@@ -1,10 +1,77 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import loginLogo from "../assets/loginLogo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { loginRoute } from "../utils/APIRoutes";
 
 function Login() {
+
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 6000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
   const loginData = { username: "", password: "" };
   const [data, setData] = useState(loginData);
+  const navigate = useNavigate();
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (handleValidations()) {
+      const { username, password } = data;
+      try {
+        const response = await axios.post(loginRoute, {
+          username,
+          password
+        });
+  
+        console.log(response.data);
+  
+        if (response.data.status === false) {
+
+          toast.error(response.data.message, toastOptions);
+        } else if (response.data.status === true) {
+          toast.success("Login Successfull. Redirecting to homepage", toastOptions);
+          localStorage.setItem('chat-app-user', JSON.stringify(response.data.user));
+          setTimeout(() => {
+            navigate('/');
+          }, 4000);
+        }
+  
+      } catch (error) {
+        console.error("Registration failed:", error.response.data);
+        toast.error(error.response.data.message, toastOptions);
+      }
+    }
+  };
+
+
+  const handleValidations = () => {
+    const {username, password} = data;
+    if(username.length===""){
+      toast.error("Username is required...", toastOptions);
+      return false;
+    }else if(password===""){
+      toast.error("Passowrd is required...", toastOptions);
+      return false;
+    }
+
+    return true;
+  }
+
+  useEffect(
+    () => {
+      if(localStorage.getItem('chat-app-user')){
+        navigate('/');
+      }
+    }
+  )
 
   return (
     <div className="w-screen h-screen bg-[#131324] flex justify-center items-center">
@@ -21,7 +88,9 @@ function Login() {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <form className="flex flex-col justify-center items-center gap-6 w-full">
+          <form className="flex flex-col justify-center items-center gap-6 w-full"
+            onSubmit={(e) => handleSubmit(e)}
+          >
             <input
               type="text"
               placeholder="Username"
@@ -29,6 +98,7 @@ function Login() {
               value={data.username}
               onChange={(e) => setData({ ...data, username: e.target.value })}
               required
+              min="3"
               className="bg-transparent border-[#480eea] border-[1px] rounded-lg text-[#5b5f67] p-2 text-sm w-3/4"
             />
             <input
@@ -56,6 +126,7 @@ function Login() {
           </p>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }

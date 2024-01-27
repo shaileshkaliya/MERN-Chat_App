@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/loginLogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -15,7 +15,7 @@ function Register() {
   };
   const toastOptions = {
     position: "bottom-right",
-    autoClose: 8000,
+    autoClose: 6000,
     pauseOnHover: true,
     draggable: true,
     theme: "dark",
@@ -26,7 +26,7 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (handleValidation()) {
       const { username, email, password } = formData;
       try {
@@ -35,21 +35,27 @@ function Register() {
           email,
           password,
         });
-        
+  
         console.log(response.data);
+  
         if (response.data.status === false) {
-          toast.error(response.data.msg, toastOptions);
+
+          toast.error(response.data.message, toastOptions);
+        } else if (response.data.status === true) {
+          toast.success("Registration Successfull. Redirecting to homepage", toastOptions);
+          localStorage.setItem('chat-app-user', JSON.stringify(response.data.user));
+          setTimeout(() => {
+            navigate('/');
+          }, 4000);
         }
-        if (response.data.status === true) {
-          toast.success(response.data.msg, toastOptions);
-          navigate('/')
-        }
-        
+  
       } catch (error) {
         console.error("Registration failed:", error.response.data);
+        toast.error(error.response.data.message, toastOptions);
       }
     }
   };
+  
 
   const handleValidation = () => {
     const { username, email, password, confirmPassword } = formData;
@@ -70,6 +76,14 @@ function Register() {
 
     return true;
   };
+
+  useEffect(
+    () => {
+      if(localStorage.getItem('chat-app-user')){
+        navigate('/');
+      }
+    }
+  )
 
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-[#131324]">
@@ -96,6 +110,7 @@ function Register() {
                 setFormData({ ...formData, username: e.target.value })
               }
               required
+              min="3"
               className="bg-transparent border-[#480eea] border-[1px] rounded-lg text-[#5b5f67] p-2 text-sm w-3/4"
             />
             <input
