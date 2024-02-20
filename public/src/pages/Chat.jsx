@@ -10,6 +10,7 @@ function Chat() {
   const [contacts, setContacts] = useState([]);
   const [currentUser, setCurrentUser] = useState(undefined);
   const [currentChat, setCurrentChat] = useState(undefined);
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,7 @@ function Chat() {
       } else {
         const userFromLocalStorage = JSON.parse(localStorage.getItem('chat-app-user'));
         setCurrentUser(userFromLocalStorage);
+        setIsLoaded(true);
 
         if (userFromLocalStorage.isAvatarImageSet) {
           try {
@@ -48,9 +50,9 @@ function Chat() {
         </div>
         <div className='basis-3/4'>
           {
-            currentChat===undefined ? 
-            currentUser && <Welcome currentUser={currentUser} /> : 
-            currentUser && <ChatContainer currentUser={currentUser} />
+            isLoaded && currentChat===undefined ? 
+            <Welcome currentUser={currentUser} /> : 
+            <ChatContainer currentChat={currentChat} />
           }
         </div>
       </div>

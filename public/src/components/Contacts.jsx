@@ -36,8 +36,9 @@ function Contacts({ contacts, currentUser, handleChangeChat }) {
             return (
               <div
                 key={index}
-                className={`flex gap-4 items-center p-4 ${index==currentSelected ? "bg-[#0a0a13]": "bg-gray-900"}`}
+                className={`flex gap-4 items-center p-4 cursor-pointer ${index==currentSelected ? "bg-[#0a0a13]": "bg-gray-900"}`}
                 onClick={() => changeCurrentChat(index, c)}
+
               >
                 {(() => {
                   let svgString = c.avatarImage;
