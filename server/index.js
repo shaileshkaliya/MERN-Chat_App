@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
 const router = require('./routes/user-routes.js')
+const messagesRoute = require('./routes/message-routes.js')
  
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -16,7 +17,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/auth", router);
-
+app.use("/api/messages", messagesRoute)
 
 const start = async() => {
     try {

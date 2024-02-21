@@ -3,14 +3,27 @@ import parse from "html-react-parser";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
 import Messages from "./Messages";
+import axios from "axios";
+import {sendMsgRoute} from '../utils/APIRoutes'
 
-function ChatContainer({ currentChat }) {
-  const handleSendMsg = async () => {};
+function ChatContainer({ currentChat, currentUser }) {
+  const handleSendMsg = async (msg) => {
+    try{
+      await axios.post(sendMsgRoute, {
+        message:msg,
+        from : currentUser._id,
+        to : currentChat._id
+      }
+      )
+    }catch(er){
+      console.log(er);
+    }
+  };
 
   return (
     <>
       {currentChat && (
-        <div className="text-white w-full h-full ">
+        <div className="text-white w-full h-full overflow-y-hidden ">
           <div className="flex justify-between gap-6 items-center pt-4 px-8 h-1/6">
             <div className="flex justify-start gap-6 items-center ">
               {(() => {
@@ -34,9 +47,7 @@ function ChatContainer({ currentChat }) {
             <Messages />
           </div>
 
-          <div className="h-1/6 w-full">
             <ChatInput handleSendMsg={handleSendMsg} />
-          </div>
         </div>
       )}
     </>
